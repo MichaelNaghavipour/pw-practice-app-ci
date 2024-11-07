@@ -97,3 +97,39 @@ test('Tooltips', async ({ page }) => {
     // expect(tooltip).toEqual('This is a tooltip')
     await expect(page.locator('nb-tooltip')).toHaveText('This is a tooltip')
 })
+
+test('dialog box', async ({ page }) => {
+    await page.getByText('Tables & Data').click()
+    await page.getByText('Smart Table').click()
+    
+    page.on('dialog', dialog => {
+        expect(dialog.message()).toEqual('Are you sure you want to delete?')
+        dialog.accept()
+    })
+    await page.getByRole('table').locator('tr', {hasText: 'mdo@gmail.com'}).locator('.nb-trash').click()
+    await expect(page.locator('table tr').first()).not.toHaveText('mdo@gmail.com')
+})
+
+test('web tables', async ({ page }) => {
+    await page.getByText('Tables & Data').click()
+    await page.getByText('Smart Table').click()
+
+    // get the row by any text in this row
+    await page.getByRole('row', {name: 'twitter@outlook.com'}).locator('.nb-edit').click()
+    await page.locator('input-editor').getByPlaceholder('Age').clear()
+    await page.locator('input-editor').getByPlaceholder('Age').fill('34')
+    await page.locator('.nb-checkmark').click()
+
+    // await expect(page.getByRole('row', {name: 'twitter@outlook.com'}).locator('td:nth-child(7)')).toHaveText('34') // using CSS selector
+    await expect(page.getByRole('row', {name: 'twitter@outlook.com'}).locator('td').nth(6)).toHaveText('34') // using index-based locator
+
+
+    // get the row based on the value in the specific column
+    await page.locator('.ng2-smart-pagination').getByText('2').click()
+    const targetRowById = page.getByRole('row', {name: '11'}).filter({has: page.locator('td').nth(1).getByText('11')})
+    await targetRowById.locator('.nb-edit').click()
+    await page.locator('input-editor').getByPlaceholder('E-mail').clear()
+    await page.locator('input-editor').getByPlaceholder('E-mail').fill('test@test.com')
+    await page.locator('.nb-checkmark').click()
+    await expect(targetRowById.locator('td').nth(5)).toHaveText('test@test.com')
+})
