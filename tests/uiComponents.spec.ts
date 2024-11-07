@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { Tooltip } from 'leaflet'
 
 test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:4200/')
@@ -84,4 +85,15 @@ test('Lists and Dropdowns', async ({ page }) => {
         if(color !== 'Corporate')
             await dropDownMenu.click()
     }
+})
+
+test('Tooltips', async ({ page }) => {
+    await page.getByText('Modal & Overlays').click()
+    await page.getByText('Tooltip').click()
+
+    const toolTipCard = page.locator('nb-card', {hasText: 'Tooltip Placements'})
+    await toolTipCard.getByRole('button', { name: 'TOP'}).hover()
+    // const tooltip = await page.locator('nb-tooltip').textContent()
+    // expect(tooltip).toEqual('This is a tooltip')
+    await expect(page.locator('nb-tooltip')).toHaveText('This is a tooltip')
 })
