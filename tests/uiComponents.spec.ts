@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { Tooltip } from 'leaflet'
 
 test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:4200/')
+    await page.goto('/')
 })
 
 test.describe('Form Layouts Page', () => {
